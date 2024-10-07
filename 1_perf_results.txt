@@ -1,0 +1,8 @@
+daksh@breakbadsp:~/src/sprc/1brc$ time ./output/analyse ./input/input_file.txt 
+Failed to read the city , line nu:1000000001
+Failed to read the tmeps , line nu:1000000001
+
+real	2m24.579s
+user	2m20.068s
+sys	0m4.497s
+
