@@ -1,3 +1,15 @@
 .vscode
-/input/
-/output/
+input/
+bin/
+measurements.txt
+input_file.txt
+create-sample
+analyse
+
+1
+2
+3
+4
+5
+6
+7

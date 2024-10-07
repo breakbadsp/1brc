@@ -39,32 +39,29 @@ int main(int argc, char* argv[]) {
   using namespace std::literals;
   //constexpr const char* i_file_name = "./input/input_file.txt";
   constexpr const char* o_file_name = "./output/output_file.txt";
-  std::fstream ifile;
 
-  ifile.open(argv[1], std::ios_base::in);
+  std::fstream ifile(argv[1], std::ios_base::in);
   assert(ifile.is_open());
 
   std::unordered_map<std::string, Station> data;
-  
   std::string city;
   std::string temps;
 
-  size_t ln {0};
   while(!ifile.eof()) {
-    ++ln;
     if(!std::getline(ifile, city, ';')) [[unlikely]] {
       std::cout << "Failed to read the city " << city << ", line nu:" << ln <<  '\n';
+      break;
     }	
 
     if(!std::getline(ifile, temps, '\n')) [[unlikely]] {
-
       std::cout << "Failed to read the tmeps " << city << ", line nu:" << ln <<  '\n';
+      break;
     }
 
     data[city].Add(std::atof(temps.c_str()));
   }
-  ifile.close();
 
+  ifile.close();
   std::ofstream ofile(o_file_name, std::ios::app);
   assert(ofile.is_open());
   ofile.clear();
@@ -83,4 +80,5 @@ int main(int argc, char* argv[]) {
     ofile << oline.c_str();
     oline.clear();
   }
+  ofile.close();
 }
