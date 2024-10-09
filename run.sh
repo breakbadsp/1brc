@@ -1,4 +1,4 @@
-#!/user/bin/bash
+#!/bin/sh
 
 rm -f ./bin/analyse
 make -j4

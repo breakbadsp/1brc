@@ -1,10 +1,13 @@
 .vscode
 input/
 bin/
+output/
 measurements.txt
 input_file.txt
 create-sample
 analyse
+output_file*
+callgrind*
 
 1
 2
