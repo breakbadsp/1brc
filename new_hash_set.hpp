@@ -69,7 +69,8 @@ public:
         node->ele.first = p_key;
         node->state = Node::State::Allocated;
         size_++;
-        return node->ele.second;
+        if(debug) std::cout << " added " << p_key << ", size=" << size_ << '\n';
+        return node->ele.second; 
     }
 
     bool find(KeyType p_key, std::size_t& index) {

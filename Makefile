@@ -19,7 +19,7 @@ HEADERS := $(wildcard *.h, wildcard *.hpp)
 
 #.PRECIOUS: $(TARGET) $(OBJECTS)
 
-analyse:	1.cpp
+analyse:	2.cpp
 	$(CXX) $<  $(LDDFLAGS) $(CXXFLAGS) -o $(OUTDIR)/$@
 
 create-sample:	create-sample.cpp
