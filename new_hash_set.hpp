@@ -77,7 +77,7 @@ public:
         if(capacity_ == 0)
             return false;
         
-        auto hash = sp::HashString(p_key, capacity_);
+        auto hash = sp::MultiplicationHash(p_key, capacity_);
         //if(debug) std::cout << "for key:" << p_key << " has is :" << hash << '\n';
         index = hash;
         
@@ -146,7 +146,7 @@ private:
         for(sp::size_t i = 0; i < capacity_; ++i) {
             Node* old_ele = (store_ + i);
             if(old_ele->state == Node::State::Allocated) {
-                std::size_t new_hash = sp::HashString(old_ele->ele.first, new_cap);
+                std::size_t new_hash = sp::MultiplicationHash(old_ele->ele.first, new_cap);
                 Node* new_node = (new_store + new_hash);
                 while(new_node->state != Node::State::UnAllocated) {
                     new_hash = (new_hash + 1) % new_cap;
