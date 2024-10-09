@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
     auto& st = i->second;
     auto& city = i->first;
     st.CalculateMean();
-    oline += city;
+    oline = city;
     oline += ';';
     oline += std::to_string(st.min);
     oline += ';';
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
     oline += std::to_string(st.max);
     oline += '\n';
     ofile << oline.c_str();
-    oline.clear();
+    //oline.clear();
   }
   ofile.close();
 }
