@@ -91,4 +91,19 @@ namespace sp
 
     return static_cast<size_t>(table_size * frac);
   };
+  
+  size_t MultiplicationHash(std::string_view p_key, size_t table_size)
+  {
+    size_t total = 0; //static_cast<size_t>(p_key[0]);
+    for(const auto ch: p_key)
+    {
+      total += static_cast<size_t>(ch);
+    }
+    
+    constexpr double A = 0.6180339887; //constexpr double A = (std::sqrt(5) - 1) / 2;
+    const auto prod  = A * total;
+    const auto frac = prod - std::floor(prod);
+
+    return static_cast<size_t>(table_size * frac);
+  };
 }
