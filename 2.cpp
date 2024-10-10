@@ -15,14 +15,14 @@
 
 
 
-  std::array<char, 10> to_chars(double temp) {
-    std::array<char, 10> buffer;
+  auto to_chars(double temp) {
+    std::array<char, 20> buffer;
     auto result = std::to_chars(buffer.data(), buffer.data() + buffer.size(), temp);
     if (result.ec == std::errc()) {
       // Null-terminate the string manually (std::to_chars does not do this)
       *result.ptr = '\0';
     } else {
-      std::cerr << "Conversion failed!" << std::endl;
+      std::cerr << "Conversion failed for: " << temp << std::endl;
       exit(0);
     }
     return buffer;
@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  sp::MyHashSet<std::string, Station> data(1000);
+  sp::MyHashSet<std::string_view, Station> data(1000);
   double temp {0};
 
   long offset = 0;
@@ -95,13 +95,10 @@ int main(int argc, char* argv[]) {
     std::string_view temps(mmf_cstr + beg, (size_t)(offset - beg + 1));
 
     std::from_chars(temps.data(), temps.data()+temps.size(), temp);
-    data[std::string(city)].Add(temp);
+    data[city].Add(temp);
   }
 
-  assert(munmap(mmf, (size_t)sb.st_size) != -1);
-  close(ifd);
   //if(debug) std::cout << "Total stations: " << data.size() << '\n';
-
 
   //Writing to output file
   auto ofd = open(argv[2], O_RDWR|O_CREAT, 0666);
@@ -145,6 +142,9 @@ int main(int argc, char* argv[]) {
     memcpy(waddr, oline.c_str(), l);
     woffset = woffset + l + 1;
   }
-  assert(munmap(mmf, (size_t)sb.st_size) != -1);
+  munmap(ommf, data.size() * 40);
   close(ofd);
+  
+  munmap(mmf, (size_t)sb.st_size);
+  close(ifd);
 }
