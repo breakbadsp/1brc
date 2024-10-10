@@ -8,9 +8,25 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <cstring> // for strerror()
+#include <array>
+#include <optional>
 
 #include "new_hash_set.hpp"
 
+
+
+  std::array<char, 10> to_chars(double temp) {
+    std::array<char, 10> buffer;
+    auto result = std::to_chars(buffer.data(), buffer.data() + buffer.size(), temp);
+    if (result.ec == std::errc()) {
+      // Null-terminate the string manually (std::to_chars does not do this)
+      *result.ptr = '\0';
+    } else {
+      std::cerr << "Conversion failed!" << std::endl;
+      exit(0);
+    }
+    return buffer;
+  }
 
 struct Station {
   double min {__INT32_MAX__};
@@ -60,8 +76,6 @@ int main(int argc, char* argv[]) {
   }
 
   sp::MyHashSet<std::string, Station> data(1000);
-  std::string city;
-  std::string temps;
   double temp {0};
 
   long offset = 0;
@@ -74,14 +88,14 @@ int main(int argc, char* argv[]) {
     ++ln;
     long beg = offset;
     while(*(mmf_cstr + offset) != ';') ++offset;
-    city = std::string(mmf_cstr + beg, (size_t)(offset - beg));
+    std::string_view city(mmf_cstr + beg, (size_t)(offset - beg));
 
     beg = offset + 1;
     while(*(mmf_cstr + offset) != '\n') ++offset;
-    temps = std::string(mmf_cstr + beg, (size_t)(offset - beg + 1));
+    std::string_view temps(mmf_cstr + beg, (size_t)(offset - beg + 1));
 
     std::from_chars(temps.data(), temps.data()+temps.size(), temp);
-    data[city].Add(temp);
+    data[std::string(city)].Add(temp);
   }
 
   assert(munmap(mmf, (size_t)sb.st_size) != -1);
@@ -106,24 +120,25 @@ int main(int argc, char* argv[]) {
   ret = fstat(ofd, &sd2);
   assert(ret != -1);
 
-  void* ommf = mmap(nullptr, total_lines * 100, PROT_WRITE | PROT_READ, MAP_SHARED, ofd, 0);
+  void* ommf = mmap(nullptr, data.size() * 40, PROT_WRITE | PROT_READ, MAP_SHARED, ofd, 0);
   if(ommf == MAP_FAILED) [[unlikely]] {
     return -1;
   }
 
   size_t woffset = 0;
   std::string oline;
+  oline.reserve(15);
   for(auto i = data.begin();  i != data.end(); ++i) {
     auto& st = i->second;
     auto& city = i->first;
     st.CalculateMean();
     oline = city;
     oline += ';';
-    oline += std::to_string(st.min);
+    oline += to_chars(st.min).data();
     oline += ';';
-    oline += std::to_string(st.mean);
+    oline += to_chars(st.mean).data();
     oline += ';';
-    oline += std::to_string(st.max);
+    oline += to_chars(st.max).data();
     //if(debug) LOG( << "writing line: " << oline << '\n';
     const auto l = oline.size();
     void* waddr = (void*) ((char*)ommf + woffset);

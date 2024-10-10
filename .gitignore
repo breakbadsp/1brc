@@ -1,7 +1,7 @@
 .vscode
 input/
 bin/
-output/
+output/**
 measurements.txt
 input_file.txt
 create-sample
