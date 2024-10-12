@@ -1,10 +1,11 @@
 
 OUTDIR = bin
 TARGET = analyse create-sample
-CXXFLAGS 	= -g -std=c++23 -O3 -Wall -Wextra -Werror -Wconversion
+CXXFLAGS 	= -g -std=c++23 -O3 -Wall -Wextra -Werror #-Wconversion 
+CXXFLAGS += -Wno-implicit-int-float-conversion
 CXXFLAGS += -Wformat -Wformat=2 -Wimplicit-fallthrough 
 CXXFLAGS += -Wvla -m64 -march=native -mtune=native 
-CXXFLAGS += -flto -Wno-implicit-int-float-conversion
+CXXFLAGS += -flto 
 #CXXFLAGS += -fsanitize=address,undefined,leak
 
 HEADERS := $(wildcard *.h, wildcard *.hpp)

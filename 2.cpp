@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  sp::MyHashSet<std::string_view, Station> data(1000);
+  sp::MyHashSet<std::string_view, Station> data(2003);
   double temp {0};
 
   long offset = 0;
@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  auto ret = truncate(argv[2], total_lines * 100);//total_lines * 1000);
+  auto ret = truncate(argv[2], (long)data.size() * 30);//total_lines * 1000);
   if(ret == -1) [[unlikely]] {
     //if(debug) LOG( << "Failed to truncate file: errono: " << errno << ' ' << strerror(errno) << '\n';
     return -1;
