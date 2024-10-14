@@ -1,6 +1,6 @@
 
 OUTDIR = bin
-TARGET = analyse create-sample
+TARGET = analyse create-sample analyse_uo_map
 CXXFLAGS 	= -g -std=c++23 -O3 -Wall -Wextra -Werror #-Wconversion 
 CXXFLAGS += -Wno-implicit-int-float-conversion
 CXXFLAGS += -Wformat -Wformat=2 -Wimplicit-fallthrough 
@@ -25,6 +25,9 @@ analyse:	2.cpp
 
 create-sample:	create-sample.cpp
 	$(CXX) $< $(LDDFLAGS) $(CXXFLAGS) -o $(OUTDIR)/$@
+
+analyse_uo_map:	2_unordered_map.cpp
+	$(CXX) $<  $(LDDFLAGS) $(CXXFLAGS) -o $(OUTDIR)/$@
 
 clean:
 	rm $(OBJECTS)
