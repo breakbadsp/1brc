@@ -106,4 +106,34 @@ namespace sp
 
     return static_cast<size_t>(table_size * frac);
   };
+
+
+
+  /*
+  FNV Hash Algorithm
+    Initialization: Start with a predefined offset basis and a prime number.
+        Commonly used values:
+            Offset Basis: 2166136261 (for 32-bit)
+            Prime: 16777619 (for 32-bit)
+
+    Hash Calculation:
+        For each byte in the input data:
+            Multiply the current hash value by the prime number.
+            XOR the hash value with the byte.
+
+    Output: The final hash value is the result after processing all bytes.
+  */
+  size_t Fnv1aHash(const std::string_view& p_key) {
+    const size_t offset_basis = 2166136261u;
+    const size_t prime = 16777619u;
+
+    size_t hash_value = offset_basis;
+
+    for(const auto ch: p_key)
+    {
+      hash_value ^= static_cast<size_t>(ch);
+      hash_value *= prime;
+    }
+    return static_cast<size_t>(hash_value);
+  }
 }
