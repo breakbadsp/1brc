@@ -26,7 +26,7 @@ auto to_chars(float temp)
     // Null-terminate the string manually (std::to_chars does not do this)
     *result.ptr = '\0';
   }
-  else
+  else [[unlikely]]
   {
     std::cerr << "Conversion failed for: " << temp << std::endl;
     exit(0);
@@ -45,10 +45,10 @@ struct Station
 
   void Add(float temp)
   {
-    if (temp < min) [[unlikely]]
+    if (temp < min)
       min = temp;
 
-    if (temp > max) [[unlikely]]
+    if (temp > max)
       max = temp;
 
     total += temp;
@@ -65,10 +65,10 @@ struct Station
     if (&p_rhs == this)
       return *this;
 
-    if (p_rhs.min < min) [[unlikely]]
+    if (p_rhs.min < min)
       min = p_rhs.min;
 
-    if (p_rhs.max > max) [[unlikely]]
+    if (p_rhs.max > max)
       max = p_rhs.max;
 
     total += p_rhs.total;
@@ -82,7 +82,7 @@ void Worker(void *mmf, long start, long last, sp::MyHashSet<std::string_view, St
   static std::atomic_short thread_id = 0;
   if(debug) std::cout << "Thread " << ++thread_id << " started.\n";
   char *mmf_cstr = (char *)mmf;
-  if(start != 0) 
+  if(start != 0) [[likely]]
   {
     while (*(mmf_cstr + start) != '\n')
     {
@@ -98,12 +98,11 @@ void Worker(void *mmf, long start, long last, sp::MyHashSet<std::string_view, St
     while (*(mmf_cstr + offset) != ';')
       ++offset;
     std::string_view city(mmf_cstr + beg, (size_t)(offset - beg));
-
+    
     beg = ++offset;
     while (*(mmf_cstr + offset) != '\n')
       ++offset;
     std::string_view temps(mmf_cstr + beg, (size_t)(offset - beg + 1));
-
     std::from_chars(temps.data(), temps.data() + temps.size(), temp);
     data[city].Add(temp);
   }
@@ -166,6 +165,7 @@ int main(int argc, char *argv[])
   }
 
   // Writing to output file
+  const size_t output_file_size = data.size() * 60;
   auto ofd = open(argv[2], O_RDWR | O_CREAT, 0666);
   if (ofd == -1) [[unlikely]]
   {
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-  auto ret = truncate(argv[2], (long)data.size() * 50 ); // total_lines * 1000);
+  auto ret = truncate(argv[2], output_file_size ); // total_lines * 1000);
   if (ret == -1) [[unlikely]]
   {
     // if(debug) LOG( << "Failed to truncate file: errono: " << errno << ' ' << strerror(errno) << '\n';
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
   ret = fstat(ofd, &sd2);
   assert(ret != -1);
 
-  void *ommf = mmap(nullptr, data.size() * 50, PROT_WRITE | PROT_READ, MAP_SHARED, ofd, 0);
+  void *ommf = mmap(nullptr, output_file_size, PROT_WRITE | PROT_READ, MAP_SHARED, ofd, 0);
   if (ommf == MAP_FAILED) [[unlikely]]
   {
     return -1;
