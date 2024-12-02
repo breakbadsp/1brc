@@ -80,7 +80,11 @@ struct Station
 void Worker(void *mmf, long start, long last, sp::MyHashSet<std::string_view, Station> &data)
 {
   static std::atomic_short thread_id = 0;
-  if(debug) std::cout << "Thread " << ++thread_id << " started.\n";
+  const thread_local auto tid = ++thread_id;
+  //std::cout<< "Thread " << tid << " is started.\n";
+
+  const auto& start_time = std::chrono::high_resolution_clock::now();
+
   char *mmf_cstr = (char *)mmf;
   if(start != 0) [[likely]]
   {
@@ -106,6 +110,9 @@ void Worker(void *mmf, long start, long last, sp::MyHashSet<std::string_view, St
     std::from_chars(temps.data(), temps.data() + temps.size(), temp);
     data[city].Add(temp);
   }
+  const auto& end_time = std::chrono::high_resolution_clock::now();
+  const auto& duration_millis = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+  std::cout << "Thread " << tid << " is done." << " time:" << duration_millis.count()  <<  " ms.\n" ;
 }
 
 int main(int argc, char *argv[])
@@ -137,7 +144,7 @@ int main(int argc, char *argv[])
     return -1;
   }
   madvise(mmf, (size_t)sb.st_size, MADV_WILLNEED);
-  long unit = (size_t)sb.st_size / 6; // number of processors
+  const long unit = (size_t)sb.st_size / 6; // number of processors
   std::array<sp::MyHashSet<std::string_view, Station>, 6> datas;
   long offset = 0;
 
@@ -154,6 +161,7 @@ int main(int argc, char *argv[])
   for (auto &t : workers)
     t.join();
 
+  //std::cout << "Data processing done, generating output." << '\n';
   sp::MyHashSet<std::string_view, Station> data;
   for (auto &d : datas)
   {
